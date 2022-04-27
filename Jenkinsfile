@@ -1,54 +1,44 @@
-pipeline {
+node {
+    stage('Checkout') {
+        //disable to recycle workspace data to save time/bandwidth
+        deleteDir()
+        checkout scm
 
-  agent none
+        //enable for commit id in build number
+        //env.git_commit_id = sh returnStdout: true, script: 'git rev-parse HEAD'
+        //env.git_commit_id_short = env.git_commit_id.take(7)
+        //currentBuild.displayName = "#${currentBuild.number}-${env.git_commit_id_short}"
+    }
 
-  environment {
-    DOCKER_IMAGE = "ParkingLot_FE"
-  }
+    stage('NPM Install') {
+        withEnv(["NPM_CONFIG_LOGLEVEL=warn"]) {
+            sh 'npm install'
+        }
+    }
 
-  stages {
-    // stage("Test") {
-    //   agent {
-    //       docker {
-    //         image 'python:3.8-slim-buster'
-    //         args '-u 0:0 -v /tmp:/root/.cache'
-    //       }
-    //   }
-    //   steps {
-    //     sh "pip install poetry"
-    //     sh "poetry install"
-    //     sh "poetry run pytest"
-    //   }
+    // stage('Test') {
+    //     withEnv(["CHROME_BIN=/usr/bin/chromium-browser"]) {
+    //       sh 'ng test --progress=false --watch false'
+    //     }
+    //     junit '**/test-results.xml'
     // }
 
-    stage("build") {
-      agent { node {label 'master'}}
-      environment {
-        DOCKER_TAG="${GIT_BRANCH.tokenize('/').pop()}-${GIT_COMMIT.substring(0,7)}"
-      }
-      steps {
-        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} . "
-        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
-        sh "docker image ls | grep ${DOCKER_IMAGE}"
-        withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
-            sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-            sh "docker push ${DOCKER_IMAGE}:latest"
-        }
+    stage('Lint') {
+        sh 'ng lint'
+    }
 
-        //clean to save disk
-        sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
-        sh "docker image rm ${DOCKER_IMAGE}:latest"
-      }
+    stage('Build') {
+        milestone()
+        sh 'ng build --prod --aot --sm --progress=false'
     }
-  }
 
-  post {
-    success {
-      echo "SUCCESSFUL"
+    // stage('Archive') {
+    //     sh 'tar -cvzf dist.tar.gz --strip-components=1 dist'
+    //     archive 'dist.tar.gz'
+    // }
+
+    stage('Deploy') {
+        milestone()
+        echo "Deploying..."
     }
-    failure {
-      echo "FAILED"
-    }
-  }
 }
