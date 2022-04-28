@@ -3,8 +3,6 @@ node {
   stages {
     stage('Checkout') {
       steps {
-        echo 'Checkout master branch'
-        checkout scm
         dir('ParkingLot_FE') {
           sh 'npm install'
         }
