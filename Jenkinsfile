@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh "Install package.json"
+                echo "Install package.json"
                 sh "npm config ls"
             }
         }
