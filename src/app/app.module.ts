@@ -17,7 +17,7 @@ import { FakeAPIService } from './_fake/fake-api.service';
 
 function appInitializer(authService: AuthService) {
   return () => {
-    return new Promise((resolve) => {
+    return new Promise((resolve: any) => {
       authService.getUserByToken().subscribe().add(resolve);
     });
   };
