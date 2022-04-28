@@ -11,7 +11,7 @@ pipeline {
             steps {
                 echo "Install package.json"
                 sh "npm install"
-                sh "ng build -prod --progress=true"
+                sh "ng build --progress=true"
             }
         }
     }
