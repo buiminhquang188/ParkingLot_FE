@@ -29,7 +29,7 @@ node {
 
     stage('Build') {
         milestone()
-        sh 'ng build --prod --aot --sm --progress=false'
+        sh 'ng build --prod --aot --progress=true'
     }
 
     // stage('Archive') {
@@ -37,8 +37,8 @@ node {
     //     archive 'dist.tar.gz'
     // }
 
-    stage('Deploy') {
-        milestone()
-        echo "Deploying..."
-    }
+    // stage('Deploy') {
+    //     milestone()
+    //     echo "Deploying..."
+    // }
 }
