@@ -6,7 +6,7 @@ node {
         echo 'Checkout master branch'
         checkout scm
         dir('ParkingLot_FE') {
-          bat 'npm install'
+          sh 'npm install'
         }
       }
     }
@@ -14,7 +14,7 @@ node {
       steps {
         echo 'Building..'
         dir('ParkingLot_FE') {
-          bat 'npm run ng -- build --prod --baseHref=/ParkingLot_FE/ -optimization=true'
+          sh 'npm run ng -- build --prod --baseHref=/ParkingLot_FE/ -optimization=true'
         }
       }
     }
