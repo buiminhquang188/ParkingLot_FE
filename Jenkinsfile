@@ -6,7 +6,8 @@ pipeline {
         stage('build') {
             steps {
                 echo "Install package.json"
-                sh "npm config ls"
+                sh "npm install"
+                sh "ng build -prod --progress=true"
             }
         }
     }
